@@ -1,0 +1,13 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Log in - ParkVision</title><link rel="stylesheet" href="style.css"></head><body>
+<header class="nav" id="nav"></header><main style="max-width:420px"><div class="card"><h2>Log in</h2>
+<form id="f"><label for="email">Email</label><input id="email" type="email" required>
+<label for="pw">Password</label><input id="pw" type="password" minlength="8" required>
+<label><input type="checkbox" id="show" style="width:auto"> Show password</label><p class="err" id="err" role="alert"></p>
+<button class="btn" id="go">Log in</button></form><p><a href="register.html">Create account</a></p></div></main>
+<script src="script.js"></script><script>nav(false);
+show.onchange=()=>pw.type=show.checked?'text':'password';
+f.onsubmit=async e=>{e.preventDefault();err.textContent='';go.disabled=true;
+try{const b={email:email.value,password:pw.value};
+if('login'==='register'){b.name=name.value;b.phone=phone.value;}
+const d=await api('/api/auth/login','POST',b);location.href=d.role==='admin'?'dashboard.html':'dashboard.html';}
+catch(x){err.textContent=x.message}go.disabled=false;}</script></body></html>

@@ -1,0 +1,23 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Parking - ParkVision</title><link rel="stylesheet" href="style.css"></head><body>
+<header class="nav" id="nav"></header><main><h2>Parking slots</h2>
+<div class="card legend"><span><i class="dot" style="background:var(--green)"></i>Available</span><span><i class="dot" style="background:var(--red)"></i>Occupied</span><span><i class="dot" style="background:var(--amber)"></i>Reserved now</span><span><i class="dot" style="background:#999"></i>Unavailable</span>
+<p class="note">Occupancy comes from camera/sensor feeds once connected; until then slots without readings show as available if unbooked.</p>
+<label for="ft">Filter by type</label><select id="ft"><option value="">All</option><option>regular</option><option>ev</option><option>accessible</option><option>reserved</option></select></div>
+<div class="slots" id="slots">Loading…</div><p class="err" id="err" role="alert"></p>
+<div class="card" id="bk" hidden><h3>Book slot <span id="sc"></span></h3>
+<label for="vh">Vehicle</label><select id="vh"></select><p><a href="vehicles.html">Add a vehicle</a></p>
+<label for="st">Start</label><input type="datetime-local" id="st"><label for="en">End</label><input type="datetime-local" id="en">
+<p><button class="btn" id="go">Confirm booking</button></p></div></main>
+<script src="script.js"></script><script src="/socket.io/socket.io.js"></script><script>
+let all=[],sel=null;
+(async()=>{if(!await requireAuth())return;
+const vs=(await api('/api/vehicles')).vehicles;vh.innerHTML=vs.map(v=>'<option value="'+v.id+'">'+esc(v.registration_number)+(v.is_ev?' (EV)':'')+'</option>').join('');
+async function load(){try{all=(await api('/api/parking')).slots;draw()}catch(e){err.textContent=e.message}}
+function draw(){const l=all.filter(s=>!ft.value||s.slot_type===ft.value);
+slots.innerHTML=l.map(s=>'<button class="slot '+s.status+(s.slot_type==='ev'?' ev':'')+'" data-id="'+s.id+'" '+(s.status==='unavailable'?'disabled':'')+'><b>'+esc(s.slot_code)+'</b><small class="t">'+esc(s.slot_type)+'</small><small>'+esc(s.status)+'</small></button>').join('')||'No slots match.';}
+ft.onchange=draw;
+slots.onclick=e=>{const b=e.target.closest('.slot');if(!b)return;sel=all.find(s=>s.id==b.dataset.id);sc.textContent=sel.slot_code;bk.hidden=false;};
+go.onclick=async()=>{err.textContent='';try{
+const d=await api('/api/reservations','POST',{slot_id:sel.id,vehicle_id:+vh.value,start_time:new Date(st.value).toISOString(),end_time:new Date(en.value).toISOString()});
+alert('Booked! Reference '+d.booking_reference);bk.hidden=true;load();}catch(x){err.textContent=x.message}};
+load();live(load);})();</script></body></html>

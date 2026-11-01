@@ -1,0 +1,12 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Vehicles - ParkVision</title><link rel="stylesheet" href="style.css"></head><body>
+<header class="nav" id="nav"></header><main><h2>My vehicles</h2><div class="card" id="list">Loading…</div>
+<div class="card"><h3>Add a vehicle</h3><label for="reg">Registration number</label><input id="reg"><label for="ty">Type</label><select id="ty"><option>car</option><option>suv</option><option>bike</option></select>
+<label for="mk">Make</label><input id="mk"><label for="md">Model</label><input id="md"><label><input type="checkbox" id="ev" style="width:auto"> Electric vehicle</label>
+<p class="err" id="err" role="alert"></p><button class="btn" id="add">Add vehicle</button></div></main>
+<script src="script.js"></script><script>
+(async()=>{if(!await requireAuth())return;
+async function load(){const v=(await api('/api/vehicles')).vehicles;
+list.innerHTML=v.length?'<table>'+v.map(x=>'<tr><td>'+esc(x.registration_number)+'</td><td>'+esc(x.vehicle_type)+'</td><td>'+esc(x.make)+' '+esc(x.model)+'</td><td>'+(x.is_ev?'EV':'')+'</td><td><button class="btn alt" data-id="'+x.id+'">Delete</button></td></tr>').join('')+'</table>':'No vehicles yet.';}
+list.onclick=async e=>{if(e.target.dataset.id){try{await api('/api/vehicles/'+e.target.dataset.id,'DELETE');load()}catch(x){err.textContent=x.message}}};
+add.onclick=async()=>{err.textContent='';try{await api('/api/vehicles','POST',{registration_number:reg.value,vehicle_type:ty.value,make:mk.value,model:md.value,is_ev:ev.checked});reg.value='';load()}catch(x){err.textContent=x.message}};
+load();})();</script></body></html>

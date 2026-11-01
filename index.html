@@ -1,0 +1,10 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>ParkVision</title><link rel="stylesheet" href="style.css"></head><body>
+<header class="nav" id="nav"></header>
+<section class="hero"><h1>Find a parking slot before you arrive</h1><p>ParkVision tracks slot occupancy, reserves spaces without double-booking, and keeps EV bays visible.</p>
+<a class="btn" href="login.html" style="background:#12915a">Log in</a> <a class="btn alt" href="register.html" style="color:#fff;border-color:#fff">Create account</a></section>
+<main><div class="grid">
+<div class="card"><h3>Occupancy</h3><p>Slot state from the backend. Camera and IR sensor feeds plug in later.</p></div>
+<div class="card"><h3>Reservations</h3><p>Time-slot bookings checked inside a database transaction.</p></div>
+<div class="card"><h3>EV bays</h3><p>EV slots are bookable only by EV-eligible vehicles.</p></div></div>
+<p class="note">Slots show "unknown" occupancy until real hardware reports. No live data is simulated.</p></main>
+<script src="script.js"></script><script>nav(false)</script></body></html>

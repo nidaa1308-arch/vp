@@ -1,0 +1,1219 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ParkVision | Smart Parking Dashboard</title>
+  <style>
+    :root {
+      --bg: #f4f7fb;
+      --card: #ffffff;
+      --text: #182230;
+      --muted: #718096;
+      --line: #e6ebf2;
+      --green: #16865b;
+      --red: #d94848;
+      --amber: #c58213;
+      --blue: #3867e8;
+      --nav: #111c31;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    button, input, select { font: inherit; }
+    button { cursor: pointer; }
+
+    .layout {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: 225px minmax(0, 1fr);
+    }
+
+    aside {
+      background: var(--nav);
+      color: #fff;
+      padding: 25px 16px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      padding: 0 8px 30px;
+    }
+
+    .brand-icon {
+      width: 43px;
+      height: 43px;
+      border-radius: 13px;
+      display: grid;
+      place-items: center;
+      background: #234b9b;
+      font-size: 23px;
+    }
+
+    .brand strong { font-size: 18px; }
+    .brand small { display: block; color: #aab8d0; margin-top: 4px; }
+
+    .nav-label {
+      color: #8190aa;
+      font-size: 11px;
+      letter-spacing: 1.5px;
+      margin: 12px 10px;
+    }
+
+    .nav-item {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px;
+      margin: 5px 0;
+      border: 0;
+      border-radius: 9px;
+      color: #c8d2e4;
+      background: transparent;
+      text-align: left;
+    }
+
+    .nav-item.active {
+      color: #fff;
+      background: #253a60;
+    }
+
+    .nav-item span:first-child {
+      width: 23px;
+      text-align: center;
+      font-size: 17px;
+    }
+
+    .sidebar-bottom {
+      margin-top: 35px;
+      padding: 15px 10px;
+      color: #aab8d0;
+      border-top: 1px solid #2a3650;
+      font-size: 12px;
+      line-height: 1.7;
+    }
+
+    main { min-width: 0; }
+
+    header {
+      background: var(--card);
+      border-bottom: 1px solid var(--line);
+      padding: 20px 30px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 15px;
+    }
+
+    header h1 {
+      font-size: 23px;
+      margin: 0;
+      letter-spacing: -.5px;
+    }
+
+    header p {
+      margin: 6px 0 0;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .live-pill, .demo-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      border-radius: 20px;
+      padding: 7px 11px;
+      font-size: 12px;
+      white-space: nowrap;
+    }
+
+    .live-pill {
+      color: var(--green);
+      background: #e7f7ef;
+    }
+
+    .demo-pill {
+      color: #94620c;
+      background: #fff3d9;
+    }
+
+    .dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: currentColor;
+    }
+
+    .btn {
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      padding: 10px 13px;
+      background: white;
+      color: var(--text);
+      font-weight: 600;
+      font-size: 13px;
+    }
+
+    .btn-primary {
+      color: white;
+      background: var(--blue);
+      border-color: var(--blue);
+    }
+
+    .content { padding: 27px 30px 40px; }
+
+    .welcome {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 15px;
+      margin-bottom: 23px;
+    }
+
+    .welcome h2 { margin: 0; font-size: 20px; }
+    .welcome p { margin: 7px 0 0; color: var(--muted); font-size: 13px; }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 16px;
+      margin-bottom: 22px;
+    }
+
+    .stat, .panel {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      box-shadow: 0 3px 12px rgba(20, 35, 60, .025);
+    }
+
+    .stat { padding: 20px; }
+
+    .stat-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .stat-label { font-size: 13px; color: var(--muted); }
+
+    .stat-icon {
+      width: 37px;
+      height: 37px;
+      border-radius: 11px;
+      display: grid;
+      place-items: center;
+      font-size: 18px;
+    }
+
+    .stat-value {
+      font-size: 32px;
+      font-weight: 750;
+      letter-spacing: -1px;
+      margin-top: 13px;
+    }
+
+    .stat-note { font-size: 12px; color: var(--muted); margin-top: 5px; }
+
+    .green { background: #e3f7ed; color: var(--green); }
+    .red { background: #ffebeb; color: var(--red); }
+    .amber { background: #fff2d9; color: var(--amber); }
+    .blue { background: #e9efff; color: var(--blue); }
+
+    .overview {
+      display: grid;
+      grid-template-columns: minmax(0, 1.6fr) minmax(240px, .8fr);
+      gap: 17px;
+      margin-bottom: 22px;
+    }
+
+    .panel { padding: 21px; min-width: 0; }
+
+    .panel-heading {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+
+    .panel-heading h3 { font-size: 16px; margin: 0; }
+    .panel-heading p { color: var(--muted); font-size: 12px; margin: 6px 0 0; }
+
+    .occupancy-number {
+      font-size: 34px;
+      font-weight: 750;
+      margin: 9px 0;
+    }
+
+    .progress {
+      height: 10px;
+      background: #edf1f6;
+      border-radius: 20px;
+      overflow: hidden;
+      margin: 17px 0;
+    }
+
+    .progress-fill {
+      height: 100%;
+      width: 0;
+      background: linear-gradient(90deg, #3867e8, #53a2ff);
+      border-radius: inherit;
+      transition: width .3s;
+    }
+
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 13px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .legend span { display: inline-flex; align-items: center; gap: 6px; }
+
+    .legend i {
+      width: 9px;
+      height: 9px;
+      border-radius: 3px;
+      display: inline-block;
+    }
+
+    .ev-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin: 16px 0;
+    }
+
+    .ev-row strong { font-size: 14px; }
+    .ev-row small { display: block; color: var(--muted); margin-top: 5px; }
+
+    .ev-number { font-size: 23px; font-weight: 750; }
+
+    .filters {
+      display: grid;
+      grid-template-columns: minmax(180px, 1.5fr) repeat(3, minmax(120px, .8fr)) auto;
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+
+    .field {
+      min-width: 0;
+      width: 100%;
+      border: 1px solid var(--line);
+      background: white;
+      border-radius: 9px;
+      padding: 11px 12px;
+      color: var(--text);
+      outline: none;
+      font-size: 13px;
+    }
+
+    .field:focus {
+      border-color: #7392f3;
+      box-shadow: 0 0 0 3px #3867e815;
+    }
+
+    .slot-summary {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin: 24px 0 14px;
+    }
+
+    .slot-summary h3 { font-size: 17px; margin: 0; }
+    .slot-summary span { color: var(--muted); font-size: 12px; }
+
+    .slots {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .slot {
+      background: white;
+      border: 1px solid var(--line);
+      border-top: 4px solid #16865b;
+      border-radius: 12px;
+      padding: 16px;
+      min-width: 0;
+      transition: transform .15s, box-shadow .15s;
+    }
+
+    .slot:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 7px 20px #172a4510;
+    }
+
+    .slot.occupied { border-top-color: var(--red); }
+    .slot.reserved { border-top-color: var(--amber); }
+    .slot.unavailable { border-top-color: #8993a5; }
+
+    .slot-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .slot-code { font-size: 18px; font-weight: 750; }
+
+    .slot-car {
+      margin: 16px 0 11px;
+      font-size: 29px;
+      text-align: center;
+      padding: 12px;
+      background: #f6f8fc;
+      border-radius: 9px;
+    }
+
+    .slot-status {
+      font-size: 11px;
+      padding: 5px 8px;
+      border-radius: 20px;
+      font-weight: 650;
+      white-space: nowrap;
+    }
+
+    .status-available { background: #e4f7ec; color: #16865b; }
+    .status-occupied { background: #ffebeb; color: #c83232; }
+    .status-reserved { background: #fff2d9; color: #99630a; }
+    .status-unavailable { background: #edf0f4; color: #626e80; }
+
+    .slot-meta {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .slot-type {
+      margin-top: 12px;
+      font-size: 11px;
+      color: #52627b;
+      background: #f0f4fa;
+      padding: 6px 8px;
+      display: inline-block;
+      border-radius: 6px;
+    }
+
+    .empty, .error {
+      grid-column: 1 / -1;
+      background: white;
+      border: 1px dashed var(--line);
+      border-radius: 12px;
+      text-align: center;
+      padding: 36px 15px;
+      color: var(--muted);
+    }
+
+    .error { color: var(--red); }
+
+    .footer {
+      text-align: center;
+      font-size: 11px;
+      color: var(--muted);
+      padding-top: 25px;
+    }
+
+    @media (max-width: 1150px) {
+      .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .slots { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+      .filters { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+
+    @media (max-width: 760px) {
+      .layout { grid-template-columns: 1fr; }
+      aside { padding: 12px; }
+      .brand { padding: 4px 6px 12px; }
+      .nav-label, .sidebar-bottom { display: none; }
+      .nav-item { display: inline-flex; width: auto; margin: 3px; padding: 9px; }
+      .nav-item span:last-child { display: none; }
+      header { padding: 17px; }
+      header h1 { font-size: 19px; }
+      .header-right { gap: 6px; }
+      .live-pill { display: none; }
+      .content { padding: 18px 14px 30px; }
+      .overview { grid-template-columns: 1fr; }
+      .slots { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .welcome { align-items: flex-start; }
+    }
+
+    @media (max-width: 400px) {
+      .stats { gap: 9px; }
+      .stat { padding: 13px; }
+      .stat-value { font-size: 27px; }
+      .slots { grid-template-columns: 1fr; }
+      .filters { grid-template-columns: 1fr; }
+      .demo-pill { display: none; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="layout">
+    <aside>
+      <div class="brand">
+        <div class="brand-icon">🅿️</div>
+        <div>
+          <strong>ParkVision</strong>
+          <small>Smart Parking System</small>
+        </div>
+      </div>
+
+      <div class="nav-label">WORKSPACE</div>
+      <button class="nav-item active" type="button" onclick="showSection('parking')">
+        <span>▦</span><span>Parking overview</span>
+      </button>
+      <button class="nav-item" type="button" onclick="showSection('parking')">
+        <span>🚗</span><span>Parking slots</span>
+      </button>
+      <button class="nav-item" type="button" onclick="showSection('ev')">
+        <span>⚡</span><span>EV parking</span>
+      </button>
+
+      <div class="nav-label" style="margin-top:28px">SYSTEM</div>
+      <button class="nav-item" type="button" onclick="refreshData()">
+        <span>↻</span><span>Refresh data</span>
+      </button>
+      <button class="nav-item" type="button" onclick="logout()">
+        <span>⇥</span><span>Log out</span>
+      </button>
+
+      <div class="sidebar-bottom">
+        <strong>ParkVision Demo</strong><br>
+        Local development environment<br>
+        API port: 3000
+      </div>
+    </aside>
+
+    <main>
+      <header>
+        <div>
+          <h1>Parking Dashboard</h1>
+          <p>Monitor parking availability at a glance.</p>
+        </div>
+        <div class="header-right">
+          <span class="live-pill"><i class="dot"></i> API connected</span>
+          <span class="demo-pill" id="modeBadge">DEMO MODE</span>
+          <button class="btn" type="button" id="refreshButton" onclick="refreshData()">↻ Refresh</button>
+        </div>
+      </header>
+
+      <div class="content">
+        <section class="welcome">
+          <div>
+            <h2>Welcome to ParkVision 👋</h2>
+            <p>Here is your parking facility overview.</p>
+          </div>
+          <span id="lastUpdated" style="font-size:12px;color:#718096">Loading data…</span>
+        </section>
+
+        <section class="stats">
+          <article class="stat">
+            <div class="stat-top">
+              <span class="stat-label">Total slots</span>
+              <span class="stat-icon blue">▦</span>
+            </div>
+            <div class="stat-value" id="totalSlots">—</div>
+            <div class="stat-note">Registered parking spaces</div>
+          </article>
+
+          <article class="stat">
+            <div class="stat-top">
+              <span class="stat-label">Available</span>
+              <span class="stat-icon green">✓</span>
+            </div>
+            <div class="stat-value" id="availableSlots">—</div>
+            <div class="stat-note">Ready for parking</div>
+          </article>
+
+          <article class="stat">
+            <div class="stat-top">
+              <span class="stat-label">Occupied</span>
+              <span class="stat-icon red">🚗</span>
+            </div>
+            <div class="stat-value" id="occupiedSlots">—</div>
+            <div class="stat-note">Currently marked occupied</div>
+          </article>
+
+          <article class="stat">
+            <div class="stat-top">
+              <span class="stat-label">Reserved</span>
+              <span class="stat-icon amber">◷</span>
+            </div>
+            <div class="stat-value" id="reservedSlots">—</div>
+            <div class="stat-note">Reserved parking spaces</div>
+          </article>
+        </section>
+
+        <section class="overview">
+          <article class="panel">
+            <div class="panel-heading">
+              <div>
+                <h3>Facility occupancy</h3>
+                <p>Based on the latest parking API response</p>
+              </div>
+              <span class="stat-icon blue">📊</span>
+            </div>
+
+            <div class="occupancy-number" id="occupancyRate">—%</div>
+            <div style="font-size:13px;color:#718096" id="occupancyText">Calculating occupancy…</div>
+            <div class="progress">
+              <div class="progress-fill" id="occupancyProgress"></div>
+            </div>
+            <div class="legend">
+              <span><i style="background:#16865b"></i>Available</span>
+              <span><i style="background:#d94848"></i>Occupied</span>
+              <span><i style="background:#c58213"></i>Reserved</span>
+              <span><i style="background:#8993a5"></i>Unavailable</span>
+            </div>
+          </article>
+
+          <article class="panel" id="evPanel">
+            <div class="panel-heading">
+              <div>
+                <h3>EV charging spaces</h3>
+                <p>Electric-vehicle designated slots</p>
+              </div>
+              <span class="stat-icon green">⚡</span>
+            </div>
+
+            <div class="ev-row">
+              <div>
+                <strong>Available EV slots</strong>
+                <small>Ready for eligible vehicles</small>
+              </div>
+              <div class="ev-number" id="evAvailable">—</div>
+            </div>
+            <div class="progress">
+              <div class="progress-fill" id="evProgress"></div>
+            </div>
+            <div class="ev-row">
+              <div>
+                <strong>Total EV slots</strong>
+                <small>Designated for electric vehicles</small>
+              </div>
+              <div class="ev-number" id="evTotal">—</div>
+            </div>
+          </article>
+        </section>
+
+        <section id="parkingSection">
+          <div class="panel-heading">
+            <div>
+              <h3 style="font-size:17px;margin:0">Parking layout</h3>
+              <p style="font-size:12px;color:#718096;margin-top:6px">
+                Search and filter the current slot list.
+              </p>
+            </div>
+          </div>
+
+          <div class="filters">
+            <input class="field" id="searchInput" placeholder="Search slot code…" aria-label="Search slot code">
+
+            <select class="field" id="zoneFilter" aria-label="Filter by zone">
+              <option value="all">All zones</option>
+            </select>
+
+            <select class="field" id="statusFilter" aria-label="Filter by status">
+              <option value="all">All statuses</option>
+              <option value="available">Available</option>
+              <option value="occupied">Occupied</option>
+              <option value="reserved">Reserved</option>
+              <option value="unavailable">Unavailable</option>
+            </select>
+
+            <select class="field" id="typeFilter" aria-label="Filter by type">
+              <option value="all">All slot types</option>
+              <option value="regular">Regular</option>
+              <option value="ev">EV</option>
+              <option value="accessible">Accessible</option>
+              <option value="reserved">Reserved type</option>
+            </select>
+
+            <button class="btn" type="button" onclick="clearFilters()">Clear filters</button>
+          </div>
+
+          <div class="slot-summary">
+            <h3 id="slotHeading">All parking slots</h3>
+            <span id="slotCount">Loading…</span>
+          </div>
+
+          <div class="slots" id="slotsGrid">
+            <div class="empty">Loading parking data…</div>
+          </div>
+        </section>
+
+<!-- Demo booking modal -->
+<div id="bookingModal" class="modal-overlay" style="display:none">
+  <div class="modal-card">
+    <div class="modal-heading">
+      <div>
+        <h2 id="modalSlotTitle">Parking slot</h2>
+        <p id="modalSlotSubtitle">Slot details</p>
+      </div>
+      <button class="btn" type="button" onclick="closeBooking()">✕</button>
+    </div>
+
+    <div id="modalSlotDetails" class="modal-details"></div>
+
+    <div id="bookingForm">
+      <label for="bookingVehicle">Select vehicle</label>
+      <select id="bookingVehicle" class="field">
+        <option value="MH12AB1234">MH12AB1234 — Regular vehicle</option>
+        <option value="MH12EV2026">MH12EV2026 — Electric vehicle</option>
+      </select>
+
+      <label for="bookingStart">Start time</label>
+      <input id="bookingStart" class="field" type="datetime-local">
+
+      <label for="bookingEnd">End time</label>
+      <input id="bookingEnd" class="field" type="datetime-local">
+
+      <p class="form-hint">
+        Demo booking only. No database record or real reservation is created.
+      </p>
+
+      <p id="bookingError" class="booking-error"></p>
+
+      <button class="btn btn-primary full-btn" type="button"
+        onclick="confirmDemoBooking()">
+        Confirm demo booking
+      </button>
+    </div>
+
+    <div id="bookingSuccess" style="display:none">
+      <div class="success-icon">✓</div>
+      <h3>Demo booking confirmed!</h3>
+      <p id="bookingReference"></p>
+      <button class="btn btn-primary full-btn" type="button"
+        onclick="closeBooking()">Done</button>
+    </div>
+  </div>
+</div>
+
+<style>
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    background: rgba(12, 22, 40, .58);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    overflow-y: auto;
+  }
+
+  .modal-card {
+    width: 100%;
+    max-width: 460px;
+    max-height: 90vh;
+    overflow-y: auto;
+    background: white;
+    border-radius: 16px;
+    padding: 25px;
+    box-shadow: 0 20px 70px #0002;
+  }
+
+  .modal-heading {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+
+  .modal-heading h2 { margin: 0; font-size: 22px; }
+  .modal-heading p { color: #718096; font-size: 13px; }
+
+  .modal-details {
+    padding: 14px;
+    margin-bottom: 20px;
+    background: #f4f7fb;
+    border-radius: 10px;
+    font-size: 13px;
+    line-height: 1.9;
+  }
+
+  .modal-card label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    margin: 14px 0 7px;
+  }
+
+  .modal-card .field { width: 100%; }
+
+  .form-hint {
+    font-size: 12px;
+    line-height: 1.5;
+    color: #718096;
+  }
+
+  .booking-error { color: #c83232; font-size: 13px; }
+
+  .full-btn { width: 100%; margin-top: 10px; }
+
+  .success-icon {
+    margin: 18px auto;
+    width: 55px;
+    height: 55px;
+    border-radius: 50%;
+    background: #e3f7ed;
+    color: #16865b;
+    display: grid;
+    place-items: center;
+    font-size: 28px;
+  }
+
+  #bookingSuccess { text-align: center; }
+  #bookingSuccess p { color: #718096; font-size: 13px; }
+</style>
+
+
+        <div class="footer">
+          ParkVision · Smart Parking Management · Demo data is not live sensor data.
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    let allSlots = [];
+    let summary = {};
+    let isDemo = false;
+    let refreshTimer = null;
+
+    const $ = id => document.getElementById(id);
+
+    const escapeHtml = value => String(value ?? '').replace(/[&<>"']/g, char => ({
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;',
+      '"': '&quot;',
+      "'": '&#39;'
+    })[char]);
+
+    async function api(url, options = {}) {
+      const response = await fetch(url, {
+        credentials: 'same-origin',
+        ...options,
+        headers: {
+          ...(options.body ? { 'Content-Type': 'application/json' } : {}),
+          ...(options.headers || {})
+        }
+      });
+
+      const data = await response.json().catch(() => ({}));
+
+      if (response.status === 401) {
+        window.location.href = 'login.html';
+        throw new Error('Your session expired. Please log in again.');
+      }
+
+      if (!response.ok || data.ok === false) {
+        throw new Error(data.error || 'Unable to load data.');
+      }
+
+      return data;
+    }
+
+    async function refreshData() {
+      const button = $('refreshButton');
+      button.disabled = true;
+      button.textContent = 'Loading…';
+
+      try {
+        const [summaryData, parkingData] = await Promise.all([
+          api('/api/parking/summary'),
+          api('/api/parking')
+        ]);
+
+        summary = summaryData;
+        allSlots = Array.isArray(parkingData.slots) ? parkingData.slots : [];
+        isDemo = Boolean(summaryData.demo || parkingData.demo);
+
+        renderSummary();
+        populateZones();
+        renderSlots();
+
+        $('modeBadge').textContent = isDemo ? 'DEMO MODE' : 'CONNECTED';
+        $('lastUpdated').textContent =
+          'Last updated: ' + new Date().toLocaleTimeString();
+
+        document.querySelector('.live-pill').innerHTML =
+          '<i class="dot"></i> API connected';
+      } catch (error) {
+        if (error.message.includes('session expired')) return;
+
+        $('slotsGrid').innerHTML =
+          '<div class="error">Could not load parking data: ' +
+          escapeHtml(error.message) +
+          '<br><br>Check that the backend is running and you are logged in.</div>';
+
+        $('lastUpdated').textContent = 'Update failed';
+        document.querySelector('.live-pill').innerHTML =
+          '<i class="dot"></i> API error';
+      } finally {
+        button.disabled = false;
+        button.textContent = '↻ Refresh';
+      }
+    }
+
+    function renderSummary() {
+      const total = Number(summary.total || 0);
+      const available = Number(summary.available || 0);
+      const occupied = Number(summary.occupied || 0);
+      const reserved = Number(summary.reserved || 0);
+      const unavailable = Number(summary.unavailable || 0);
+      const evTotal = Number(summary.evTotal || 0);
+      const evAvailable = Number(summary.evAvailable || 0);
+
+      $('totalSlots').textContent = total;
+      $('availableSlots').textContent = available;
+      $('occupiedSlots').textContent = occupied;
+      $('reservedSlots').textContent = reserved;
+
+      const occupiedRate = total ? Math.round((occupied / total) * 100) : 0;
+      $('occupancyRate').textContent = occupiedRate + '%';
+      $('occupancyText').textContent =
+        occupied + ' of ' + total + ' spaces are marked occupied';
+      $('occupancyProgress').style.width = occupiedRate + '%';
+
+      $('evAvailable').textContent = evAvailable;
+      $('evTotal').textContent = evTotal;
+      $('evProgress').style.width =
+        (evTotal ? (evAvailable / evTotal) * 100 : 0) + '%';
+
+      $('slotHeading').textContent =
+        'All parking slots (' + total + ')';
+
+      $('occupancyProgress').style.background =
+        'linear-gradient(90deg,#3867e8,#53a2ff)';
+
+      // Keep all status values available for the legend and future extensions.
+      void unavailable;
+      void reserved;
+    }
+
+    function populateZones() {
+      const zoneSelect = $('zoneFilter');
+      const previous = zoneSelect.value;
+
+      const zones = [...new Set(
+        allSlots.map(slot => String(slot.zone || 'Unknown'))
+      )].sort();
+
+      zoneSelect.innerHTML =
+        '<option value="all">All zones</option>' +
+        zones.map(zone =>
+          '<option value="' + escapeHtml(zone) + '">' +
+          'Zone ' + escapeHtml(zone) + '</option>'
+        ).join('');
+
+      zoneSelect.value =
+        zones.includes(previous) ? previous : 'all';
+    }
+
+    function statusLabel(status) {
+      return ({
+        available: 'Available',
+        occupied: 'Occupied',
+        reserved: 'Reserved',
+        unavailable: 'Unavailable'
+      })[status] || 'Unknown';
+    }
+
+    function typeLabel(type) {
+      return ({
+        regular: 'Regular parking',
+        ev: '⚡ EV charging',
+        accessible: 'Accessible',
+        reserved: 'Reserved type'
+      })[type] || 'Standard';
+    }
+
+    function renderSlots() {
+      const search = $('searchInput').value.trim().toLowerCase();
+      const zone = $('zoneFilter').value;
+      const status = $('statusFilter').value;
+      const type = $('typeFilter').value;
+
+      const filtered = allSlots.filter(slot => {
+        const code = String(slot.slot_code || '').toLowerCase();
+        return (!search || code.includes(search)) &&
+          (zone === 'all' || String(slot.zone || 'Unknown') === zone) &&
+          (status === 'all' || slot.status === status) &&
+          (type === 'all' || slot.slot_type === type);
+      });
+
+      $('slotCount').textContent =
+        filtered.length + ' of ' + allSlots.length + ' slots';
+
+      if (!filtered.length) {
+        $('slotsGrid').innerHTML =
+          '<div class="empty">No parking slots match these filters.</div>';
+        return;
+      }
+
+      $('slotsGrid').innerHTML = filtered.map(slot => {
+        const currentStatus = [
+          'available', 'occupied', 'reserved', 'unavailable'
+        ].includes(slot.status) ? slot.status : 'unavailable';
+
+        const icon = currentStatus === 'occupied' ? '🚗' :
+          currentStatus === 'available' ? '🅿️' :
+          currentStatus === 'reserved' ? '🔒' : '⛔';
+
+        return `
+          <article class="slot ${currentStatus}"
+          onclick="openBooking(${Number(slot.id)})"
+          style="cursor:pointer"
+          title="Click to view slot details">
+            <div class="slot-top">
+              <span class="slot-code">${escapeHtml(slot.slot_code)}</span>
+              <span class="slot-status status-${currentStatus}">
+                ${statusLabel(currentStatus)}
+              </span>
+            </div>
+
+            <div class="slot-car">${icon}</div>
+
+            <div class="slot-meta">
+              <span>Zone ${escapeHtml(slot.zone || '—')}</span>
+              <span>Floor ${escapeHtml(slot.floor ?? '—')}</span>
+            </div>
+
+            <span class="slot-type">${typeLabel(slot.slot_type)}</span>
+          </article>
+        `;
+      }).join('');
+    }
+
+    function clearFilters() {
+      $('searchInput').value = '';
+      $('zoneFilter').value = 'all';
+      $('statusFilter').value = 'all';
+      $('typeFilter').value = 'all';
+      renderSlots();
+    }
+
+    function showSection(section) {
+      document.querySelectorAll('.nav-item').forEach(button =>
+        button.classList.remove('active')
+      );
+
+      if (section === 'ev') {
+        $('typeFilter').value = 'ev';
+        $('parkingSection').scrollIntoView({ behavior: 'smooth' });
+      } else {
+        $('typeFilter').value = 'all';
+        $('parkingSection').scrollIntoView({ behavior: 'smooth' });
+      }
+
+      renderSlots();
+    }
+
+    async function logout() {
+      try {
+        await api('/api/auth/logout', { method: 'POST' });
+      } catch (error) {
+        console.warn('Logout request failed:', error.message);
+      }
+
+      window.location.href = 'login.html';
+    }
+
+    $('searchInput').addEventListener('input', renderSlots);
+    $('zoneFilter').addEventListener('change', renderSlots);
+    $('statusFilter').addEventListener('change', renderSlots);
+    $('typeFilter').addEventListener('change', renderSlots);
+
+    // Initial data load.
+    refreshData();
+
+    // Poll the API periodically. This refreshes data but does not create
+    // real sensor readings or change the underlying demo slot states.
+    refreshTimer = setInterval(refreshData, 15000);
+
+    // Refresh immediately when the backend broadcasts a slot update.
+    if (typeof window.io === 'function') {
+      const socket = window.io();
+      socket.on('slots:changed', refreshData);
+    }
+
+    window.addEventListener('beforeunload', () => {
+      if (refreshTimer) clearInterval(refreshTimer);
+    });
+
+let selectedSlot = null;
+let demoBookings = [];
+let bookingSequence = 1;
+
+function setDefaultBookingTimes() {
+  const start = new Date(Date.now() + 60 * 60 * 1000);
+  start.setMinutes(0, 0, 0);
+
+  const end = new Date(start.getTime() + 60 * 60 * 1000);
+
+  const toLocalInput = date => {
+    const local = new Date(
+      date.getTime() - date.getTimezoneOffset() * 60000
+    );
+    return local.toISOString().slice(0, 16);
+  };
+
+  $('bookingStart').value = toLocalInput(start);
+  $('bookingEnd').value = toLocalInput(end);
+}
+
+function openBooking(slotId) {
+  selectedSlot = allSlots.find(slot => Number(slot.id) === slotId);
+
+  if (!selectedSlot) return;
+
+  $('modalSlotTitle').textContent =
+    'Parking slot ' + selectedSlot.slot_code;
+
+  $('modalSlotSubtitle').textContent =
+    'Zone ' + (selectedSlot.zone || '—') +
+    ' · Floor ' + (selectedSlot.floor ?? '—');
+
+  $('modalSlotDetails').innerHTML =
+    '<strong>Status:</strong> ' +
+    escapeHtml(statusLabel(selectedSlot.status)) +
+    '<br><strong>Type:</strong> ' +
+    escapeHtml(typeLabel(selectedSlot.slot_type)) +
+    '<br><strong>Slot ID:</strong> ' +
+    escapeHtml(selectedSlot.id);
+
+  $('bookingError').textContent = '';
+  $('bookingForm').style.display = 'block';
+  $('bookingSuccess').style.display = 'none';
+
+  const vehicleSelect = $('bookingVehicle');
+
+  // EV slots can only be booked with the demo EV.
+  [...vehicleSelect.options].forEach(option => {
+    option.disabled =
+      selectedSlot.slot_type === 'ev' &&
+      option.value !== 'MH12EV2026';
+  });
+
+  vehicleSelect.value =
+    selectedSlot.slot_type === 'ev'
+      ? 'MH12EV2026'
+      : 'MH12AB1234';
+
+  setDefaultBookingTimes();
+
+  $('bookingModal').style.display = 'flex';
+}
+
+function closeBooking() {
+  $('bookingModal').style.display = 'none';
+  selectedSlot = null;
+}
+
+function confirmDemoBooking() {
+  if (!selectedSlot) return;
+
+  const slot = selectedSlot;
+  const vehicle = $('bookingVehicle').value;
+  const start = new Date($('bookingStart').value);
+  const end = new Date($('bookingEnd').value);
+  const now = Date.now();
+
+  const fail = message => {
+    $('bookingError').textContent = message;
+  };
+
+  $('bookingError').textContent = '';
+
+  if (slot.status !== 'available') {
+    return fail('This slot is not currently available.');
+  }
+
+  if (slot.slot_type === 'ev' && vehicle !== 'MH12EV2026') {
+    return fail('Select the demo electric vehicle for an EV slot.');
+  }
+
+  if (
+    !Number.isFinite(start.getTime()) ||
+    !Number.isFinite(end.getTime()) ||
+    start.getTime() < now ||
+    end <= start ||
+    end - start > 24 * 60 * 60 * 1000
+  ) {
+    return fail('Choose a future time range of up to 24 hours.');
+  }
+
+  const overlap = demoBookings.some(booking =>
+    booking.slotId === slot.id &&
+    start < new Date(booking.end) &&
+    end > new Date(booking.start)
+  );
+
+  if (overlap) {
+    return fail('This slot already has a booking during that time.');
+  }
+
+  const reference =
+    'PV-DEMO-' + String(bookingSequence++).padStart(4, '0');
+
+  demoBookings.push({
+    reference,
+    slotId: slot.id,
+    slotCode: slot.slot_code,
+    vehicle,
+    start: start.toISOString(),
+    end: end.toISOString()
+  });
+
+  $('bookingForm').style.display = 'none';
+  $('bookingSuccess').style.display = 'block';
+
+  $('bookingReference').textContent =
+    'Reference: ' + reference +
+    '. This booking exists only in this browser session.';
+
+  // This is a simulated reservation. It does not alter the backend
+  // or claim that the physical parking space is occupied.
+}
+
+$('bookingModal').addEventListener('click', event => {
+  if (event.target.id === 'bookingModal') closeBooking();
+});
+
+document.addEventListener('keydown', event => {
+  if (event.key === 'Escape') closeBooking();
+});
+
+  </script>
+</body>
+</html>
