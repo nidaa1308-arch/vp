@@ -1,0 +1,20 @@
+name: AI code checks
+on:
+  push:
+    branches: [feat/visionpark-audit-foundations]
+  pull_request:
+    paths:
+      - 'ai/**'
+      - '.github/workflows/ai-checks.yml'
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Syntax checks
+        run: python -m py_compile ai/inference_bridge.py ai/evaluate_checkpoint.py ai/occupancy_fusion.py ai/finetune_efficientnet_local.py
+      - name: Fusion unit tests
+        run: python -m unittest discover -s ai/tests -v
