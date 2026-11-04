@@ -1,0 +1,8 @@
+{
+  "camera_id": "CAM01",
+  "description": "EXAMPLE ONLY: replace these points with your own calibrated camera view",
+  "spaces": {
+    "A1": [[50, 50], [180, 50], [180, 200], [50, 200]],
+    "A2": [[200, 50], [330, 50], [330, 200], [200, 200]]
+  }
+}
